@@ -30,7 +30,31 @@ public:
     
     return 0.;
   }
+
+private:
+  std::shared_ptr<valuemap_t> valuemap_;
   
+};
+
+class BrilcalcFilterHelper {
+ 
+public:
+  using valuemap_t = std::unordered_map<std::pair<unsigned int, unsigned int>, double, RunLumiHash>;
+
+  BrilcalcFilterHelper(const std::vector<unsigned int> &runs, const std::vector<unsigned int> &lumis) :
+  valuemap_(std::make_shared<valuemap_t>()) {
+    for (unsigned int i = 0; i < runs.size(); ++i) {
+      valuemap_->insert(std::make_pair(std::make_pair(runs[i], lumis[i]), 1));
+    }
+  }
+    
+  double operator () (unsigned int run, unsigned int lumi) const {
+    const auto it = valuemap_->find(std::make_pair(run, lumi));
+    if (it != valuemap_->end()) {
+      return 1;
+    }    
+    return 0.;
+  }
   
 private:
   std::shared_ptr<valuemap_t> valuemap_;
