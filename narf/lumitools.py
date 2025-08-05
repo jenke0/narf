@@ -63,6 +63,57 @@ def make_nbunch_helper(filename, idx, action):
     brilcalc_helper = ROOT.BrilcalcHelper(runs, lumis, vals)
     return brilcalc_helper
 
+def make_nbunch_helper(filename, idx, action):
+    runs = []
+    lumis = []
+    vals = []
+    ### readjust this
+
+    with open(filename) as lumicsv:
+        reader = csv.reader(lumicsv)
+        for row in reader:
+            if row[0][0]=="#":
+                continue
+
+            run, fill = row[0].split(":")
+            lumi, _ = row[1].split(":")
+            val = fill
+            
+            run = int(run)
+            lumi = int(lumi)
+            val = action(val)
+            
+            runs.append(run)
+            lumis.append(lumi)
+            vals.append(val)
+        
+    brilcalc_helper = ROOT.BrilcalcHelper(runs, lumis, vals)
+    return brilcalc_helper
+
+
+def make_brilcalc_filter_helper(filename):
+    runs = []
+    lumis = []
+
+    with open(filename) as lumicsv:
+        reader = csv.reader(lumicsv)
+        for row in reader:
+            if row[0][0]=="#":
+                continue
+
+            run, _ = row[0].split(":")
+            lumi, _ = row[1].split(":")
+            
+            run = int(run)
+            lumi = int(lumi)
+            
+            runs.append(run)
+            lumis.append(lumi)
+        
+    brilcalcfilter_helper = ROOT.BrilcalcFilterHelper(runs, lumis)
+    return brilcalcfilter_helper
+
+
 
 def make_lumihelper(filename):
     return make_brilcalc_helper(filename, idx=6, action=float)
